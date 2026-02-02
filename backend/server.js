@@ -12,10 +12,9 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'https://EcampusRithick.vercel.app',
+  origin: 'https://ecampusrithick.vercel.app', // Everything in small letters
   credentials: true
 }));
-
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI)

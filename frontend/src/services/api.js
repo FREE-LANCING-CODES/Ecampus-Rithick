@@ -1,14 +1,13 @@
 import axios from 'axios';
 
 // Base URL - Backend API
-const API_BASE_URL = 'https://ecampus-rithick.onrender.com';
+// Before: const API_BASE_URL = 'https://ecampus-rithick.onrender.com';
+// After (Change this):
+const API_BASE_URL = 'https://ecampus-rithick.onrender.com/api';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
 // Add token to requests automatically
