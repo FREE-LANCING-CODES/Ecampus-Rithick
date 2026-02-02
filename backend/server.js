@@ -6,15 +6,28 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+// Validate required environment variables
+if (!process.env.MONGODB_URI) {
+  console.error('❌ Error: MONGODB_URI is not defined in .env file');
+  process.exit(1);
+}
+
 // Initialize express app
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin: 'https://ecampusrithick.vercel.app', // Everything in small letters
-  credentials: true
-}));
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'https://ecampusrithick.vercel.app',
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI)
