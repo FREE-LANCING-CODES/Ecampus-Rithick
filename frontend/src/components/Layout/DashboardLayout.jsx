@@ -26,7 +26,7 @@ const DashboardLayout = ({ children }) => {
     navigate('/login');
   };
 
-  const menuItems = [
+  const studentMenuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Profile', path: '/profile', icon: User },
     { name: 'Attendance', path: '/attendance', icon: Calendar },
@@ -35,6 +35,14 @@ const DashboardLayout = ({ children }) => {
     { name: 'Timetable', path: '/timetable', icon: Clock },
   ];
 
+  const facultyMenuItems = [
+    { name: 'Dashboard', path: '/faculty/dashboard', icon: LayoutDashboard },
+    { name: 'Students', path: '/faculty/students', icon: User },
+    { name: 'Mark Attendance', path: '/faculty/attendance', icon: Calendar },
+    { name: 'Enter Marks', path: '/faculty/marks', icon: BookOpen },
+  ];
+
+  const menuItems = user?.role === 'faculty' ? facultyMenuItems : studentMenuItems;
   return (
     <div className="min-h-screen bg-black">
       {/* Sidebar */}
