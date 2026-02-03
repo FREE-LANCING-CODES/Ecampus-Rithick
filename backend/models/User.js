@@ -89,7 +89,7 @@ userSchema.pre('save', async function (next) {
 // JWT Token generate panradhu
 userSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
+    expiresIn: '30d',
   });
 };
 
