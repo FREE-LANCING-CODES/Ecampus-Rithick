@@ -4,7 +4,12 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 // Load environment variables
-dotenv.config();
+const path = require('path');
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Also log to verify
+console.log('JWT_SECRET loaded:', !!process.env.JWT_SECRET);
+console.log('MONGODB_URI loaded:', !!process.env.MONGODB_URI);
 
 // Validate required environment variables
 if (!process.env.MONGODB_URI) {
