@@ -168,7 +168,7 @@ const Login = () => {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          © 2026 eCampus 2.0 - Built by Yuvaraj
+          © 2026 eCampus 2.0 - Built by Rithick!
         </p>
       </div>
     </div>
