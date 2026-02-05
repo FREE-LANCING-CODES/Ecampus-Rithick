@@ -148,6 +148,13 @@ exports.enterMarks = async (req, res) => {
     const records = [];
 
     for (const item of marksList) {
+      // Validate marks
+      const cia1 = Math.min(Math.max(item.cia1 || 0, 0), 20);
+      const cia2 = Math.min(Math.max(item.cia2 || 0, 0), 20);
+      const cia3 = Math.min(Math.max(item.cia3 || 0, 0), 20);
+      const assignment = Math.min(Math.max(item.assignment || 0, 0), 10);
+      const totalInternal = cia1 + cia2 + cia3 + assignment;
+
       const existing = await Marks.findOne({
         student: item.studentId,
         subjectCode: subjectCode,
@@ -156,22 +163,38 @@ exports.enterMarks = async (req, res) => {
 
       if (existing) {
         // Update existing marks
-        if (item.cia1 !== undefined) existing.internalMarks.cia1 = item.cia1;
-        if (item.cia2 !== undefined) existing.internalMarks.cia2 = item.cia2;
-        if (item.cia3 !== undefined) existing.internalMarks.cia3 = item.cia3;
-        if (item.assignment !== undefined) existing.internalMarks.assignment = item.assignment;
-
-        // Recalculate total
-        existing.internalMarks.totalInternal =
-          existing.internalMarks.cia1 +
-          existing.internalMarks.cia2 +
-          existing.internalMarks.cia3 +
-          existing.internalMarks.assignment;
+        existing.internalMarks.cia1 = cia1;
+        existing.internalMarks.cia2 = cia2;
+        existing.internalMarks.cia3 = cia3;
+        existing.internalMarks.assignment = assignment;
+        existing.internalMarks.totalInternal = totalInternal;
 
         await existing.save();
         records.push({ studentId: item.studentId, action: 'updated' });
       } else {
-        records.push({ studentId: item.studentId, action: 'not found' });
+        // Create new marks record
+        await Marks.create({
+          student: item.studentId,
+          subject: subjectName,
+          subjectCode: subjectCode,
+          semester: 6,
+          academicYear: '2025-2026',
+          internalMarks: {
+            cia1,
+            cia2,
+            cia3,
+            assignment,
+            totalInternal,
+          },
+          semesterMarks: {
+            theoryMarks: 0,
+            grade: 'N/A',
+            gradePoint: 0,
+            result: 'Pending',
+          },
+          credits: 3,
+        });
+        records.push({ studentId: item.studentId, action: 'created' });
       }
     }
 
@@ -181,10 +204,10 @@ exports.enterMarks = async (req, res) => {
       data: records,
     });
   } catch (error) {
+    console.error('❌ Error in enterMarks:', error); // Log for debugging
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 // @desc    Get marks for a specific subject
 // @route   GET /api/faculty/marks/:subjectCode
 // @access  Faculty
