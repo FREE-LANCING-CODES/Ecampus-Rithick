@@ -52,6 +52,7 @@ const studentRoutes = require('./routes/studentRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/faculty', require('./routes/facultyRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Test Route
 app.get('/', (req, res) => {
