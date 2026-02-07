@@ -72,5 +72,22 @@ export const facultyAPI = {
   enterMarks: (data) => api.post('/faculty/marks', data),
   getMarksBySubject: (subjectCode) => api.get(`/faculty/marks/${subjectCode}`),
 };
+// ============ ADMIN APIs ============
+export const adminAPI = {
+  // Dashboard
+  getStats: () => api.get('/admin/stats'),
+  
+  // Students
+  getStudents: () => api.get('/admin/students'),
+  addStudent: (data) => api.post('/admin/students', data),
+  updateStudent: (id, data) => api.put(`/admin/students/${id}`, data),
+  deleteStudent: (id) => api.delete(`/admin/students/${id}`),
+  
+  // Faculty
+  getFaculty: () => api.get('/admin/faculty'),
+  addFaculty: (data) => api.post('/admin/faculty', data),
+  updateFaculty: (id, data) => api.put(`/admin/faculty/${id}`, data),
+  deleteFaculty: (id) => api.delete(`/admin/faculty/${id}`),
+};
 
 export default api;

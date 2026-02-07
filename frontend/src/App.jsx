@@ -11,7 +11,9 @@ import ViewStudents from './pages/ViewStudents';
 import MarkAttendance from './pages/MarkAttendance';
 import EnterMarks from './pages/EnterMarks';
 import useAuthStore from './store/authStore';
-
+import AdminDashboard from './pages/AdminDashboard';
+import ManageStudents from './pages/ManageStudents';
+import ManageFaculty from './pages/ManageFaculty';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -118,6 +120,31 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route
+          path="/admin/students"
+          element={
+            <ProtectedRoute>
+              <ManageStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/faculty"
+          element={
+            <ProtectedRoute>
+              <ManageFaculty />
+            </ProtectedRoute>
+          }
+        /> */}
 
         {/* Default Route */}
         <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />

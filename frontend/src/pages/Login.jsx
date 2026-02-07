@@ -66,12 +66,11 @@ const Login = () => {
           <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-400">Student Management Portal</p>
         </div>
-
-        {/* Role Selection Tabs */}
-        <div className="flex gap-2 p-1 bg-gray-900 rounded-xl mb-6 border border-gray-800">
+{/* Role Selection Tabs */}
+        <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900 rounded-xl mb-6 border border-gray-800">
           <button
             onClick={() => setSelectedRole('student')}
-            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+            className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'student'
                 ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/50'
                 : 'text-gray-400 hover:text-white hover:bg-gray-800'
@@ -81,7 +80,7 @@ const Login = () => {
           </button>
           <button
             onClick={() => setSelectedRole('faculty')}
-            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+            className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'faculty'
                 ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/50'
                 : 'text-gray-400 hover:text-white hover:bg-gray-800'
@@ -89,8 +88,17 @@ const Login = () => {
           >
             Faculty
           </button>
+          <button
+            onClick={() => setSelectedRole('admin')}
+            className={`px-4 py-3 rounded-lg font-medium transition-all ${
+              selectedRole === 'admin'
+                ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg shadow-red-500/50'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            Admin
+          </button>
         </div>
-
         {/* Glass Card */}
         <div className="bg-gradient-to-b from-gray-900/50 to-gray-900/30 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/50 shadow-2xl">
           {/* Error Message */}

@@ -13,6 +13,7 @@ import {
   GraduationCap,
   ChevronRight,
   User,
+  Users,
 } from 'lucide-react';
 
 const DashboardLayout = ({ children }) => {
@@ -42,7 +43,51 @@ const DashboardLayout = ({ children }) => {
     { name: 'Enter Marks', path: '/faculty/marks', icon: BookOpen },
   ];
 
-  const menuItems = user?.role === 'faculty' ? facultyMenuItems : studentMenuItems;
+  const adminMenuItems = [
+    { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Manage Students', path: '/admin/students', icon: Users },
+    { name: 'Manage Faculty', path: '/admin/faculty', icon: User },
+  ];
+
+  const menuItems = 
+    user?.role === 'admin' ? adminMenuItems :
+    user?.role === 'faculty' ? facultyMenuItems : 
+    studentMenuItems;
+
+  // Theme colors based on role
+  const getThemeColors = () => {
+    if (user?.role === 'admin') {
+      return {
+        cardBg: 'from-red-600/20 to-orange-600/20',
+        cardBorder: 'border-red-500/30',
+        avatarBg: 'from-red-600 to-orange-600',
+        avatarShadow: 'shadow-red-500/50',
+        activeMenu: 'from-red-600 to-orange-600',
+        activeShadow: 'shadow-red-500/50',
+      };
+    } else if (user?.role === 'faculty') {
+      return {
+        cardBg: 'from-purple-600/20 to-purple-700/20',
+        cardBorder: 'border-purple-500/30',
+        avatarBg: 'from-purple-600 to-purple-700',
+        avatarShadow: 'shadow-purple-500/50',
+        activeMenu: 'from-purple-600 to-purple-700',
+        activeShadow: 'shadow-purple-500/50',
+      };
+    } else {
+      return {
+        cardBg: 'from-blue-600/20 to-blue-700/20',
+        cardBorder: 'border-blue-500/30',
+        avatarBg: 'from-blue-600 to-blue-700',
+        avatarShadow: 'shadow-blue-500/50',
+        activeMenu: 'from-blue-600 to-blue-700',
+        activeShadow: 'shadow-blue-500/50',
+      };
+    }
+  };
+
+  const theme = getThemeColors();
+
   return (
     <div className="min-h-screen bg-black">
       {/* Sidebar */}
@@ -70,19 +115,19 @@ const DashboardLayout = ({ children }) => {
         </div>
 
         {/* User Info */}
-        <div className="p-4 mx-4 mt-4 rounded-xl bg-gradient-to-br from-blue-600/20 to-blue-700/20 border border-blue-500/30">
+        <div className={`p-4 mx-4 mt-4 rounded-xl bg-gradient-to-br ${theme.cardBg} border ${theme.cardBorder}`}>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/50">
-              {user?.name?.charAt(0) || 'S'}
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${theme.avatarBg} flex items-center justify-center text-white font-bold text-lg shadow-lg ${theme.avatarShadow}`}>
+              {user?.name?.charAt(0) || 'U'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-white truncate">{user?.name}</p>
               <p className="text-xs text-gray-400 truncate">{user?.userId}</p>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-blue-500/30">
+          <div className="mt-3 pt-3 border-t border-gray-700">
             <p className="text-xs text-gray-400">
-              {user?.department} • Year {user?.year} • Sem {user?.semester}
+              {user?.department} • {user?.role === 'admin' ? 'Administrator' : `Year ${user?.year} • Sem ${user?.semester}`}
             </p>
           </div>
         </div>
@@ -98,7 +143,7 @@ const DashboardLayout = ({ children }) => {
                 to={item.path}
                 className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group ${
                   isActive
-                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/50'
+                    ? `bg-gradient-to-r ${theme.activeMenu} text-white shadow-lg ${theme.activeShadow}`
                     : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                 }`}
               >
