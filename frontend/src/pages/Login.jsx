@@ -5,7 +5,7 @@ import { GraduationCap, Lock, User, AlertCircle } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, loading, error, clearError } = useAuthStore();
+  const { login, loading, error, clearError, setError } = useAuthStore();
 
   const [selectedRole, setSelectedRole] = useState('student');
   const [formData, setFormData] = useState({
@@ -27,8 +27,29 @@ const Login = () => {
     const result = await login(formData);
 
     if (result.success) {
-      // Redirect based on user role
+      // Get the actual user role from backend response
       const userRole = result.user?.role || 'student';
+
+      // ROLE VALIDATION - Check if role matches selected tab
+      if (selectedRole !== userRole) {
+        // Clear the login (logout immediately)
+        useAuthStore.getState().logout();
+        
+        // Show appropriate error message
+        let errorMessage = '';
+        if (selectedRole === 'student') {
+          errorMessage = '❌ This is Student Login. Please use Faculty or Admin login page.';
+        } else if (selectedRole === 'faculty') {
+          errorMessage = '❌ This is Faculty Login. Please use Student or Admin login page.';
+        } else if (selectedRole === 'admin') {
+          errorMessage = '❌ This is Admin Login. Please use Student or Faculty login page.';
+        }
+        
+        setError(errorMessage);
+        return; // Stop here, don't redirect
+      }
+
+      // Role matches - redirect to correct dashboard
       if (userRole === 'faculty') {
         navigate('/faculty/dashboard');
       } else if (userRole === 'admin') {
@@ -66,10 +87,14 @@ const Login = () => {
           <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-400">Student Management Portal</p>
         </div>
-{/* Role Selection Tabs */}
+
+        {/* Role Selection Tabs */}
         <div className="grid grid-cols-3 gap-2 p-1 bg-gray-900 rounded-xl mb-6 border border-gray-800">
           <button
-            onClick={() => setSelectedRole('student')}
+            onClick={() => {
+              setSelectedRole('student');
+              clearError();
+            }}
             className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'student'
                 ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/50'
@@ -79,7 +104,10 @@ const Login = () => {
             Student
           </button>
           <button
-            onClick={() => setSelectedRole('faculty')}
+            onClick={() => {
+              setSelectedRole('faculty');
+              clearError();
+            }}
             className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'faculty'
                 ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/50'
@@ -89,7 +117,10 @@ const Login = () => {
             Faculty
           </button>
           <button
-            onClick={() => setSelectedRole('admin')}
+            onClick={() => {
+              setSelectedRole('admin');
+              clearError();
+            }}
             className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'admin'
                 ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg shadow-red-500/50'
@@ -99,12 +130,13 @@ const Login = () => {
             Admin
           </button>
         </div>
+
         {/* Glass Card */}
         <div className="bg-gradient-to-b from-gray-900/50 to-gray-900/30 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/50 shadow-2xl">
           {/* Error Message */}
           {error && (
-            <div className="mb-6 bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg flex items-center gap-2">
-              <AlertCircle className="w-5 h-5" />
+            <div className="mb-6 bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg flex items-center gap-2 animate-shake">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <span className="text-sm">{error}</span>
             </div>
           )}
@@ -125,7 +157,13 @@ const Login = () => {
                   value={formData.userId}
                   onChange={handleChange}
                   required
-                  placeholder={selectedRole === 'student' ? 'e.g. BSC2022001' : 'e.g. FAC001'}
+                  placeholder={
+                    selectedRole === 'student' 
+                      ? 'e.g. BSC2022001' 
+                      : selectedRole === 'faculty'
+                      ? 'e.g. FAC001'
+                      : 'e.g. ADMIN001'
+                  }
                   className="block w-full pl-10 pr-3 py-3 bg-gray-900/50 border border-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
                 />
               </div>
@@ -159,7 +197,9 @@ const Login = () => {
               className={`w-full py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
                 selectedRole === 'student'
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500 shadow-blue-500/50'
-                  : 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 focus:ring-purple-500 shadow-purple-500/50'
+                  : selectedRole === 'faculty'
+                  ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 focus:ring-purple-500 shadow-purple-500/50'
+                  : 'bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-700 hover:to-orange-700 focus:ring-red-500 shadow-red-500/50'
               }`}
             >
               {loading ? (
@@ -168,7 +208,7 @@ const Login = () => {
                   Logging in...
                 </span>
               ) : (
-                `Login as ${selectedRole === 'student' ? 'Student' : 'Faculty'}`
+                `Login as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
               )}
             </button>
           </form>
