@@ -49,7 +49,7 @@ const marksSchema = new mongoose.Schema(
       totalInternal: {
         type: Number,
         default: 0,
-        max: 50,
+        max: 70,  // Changed from 50 to 70
       },
     },
 
