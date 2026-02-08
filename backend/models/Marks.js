@@ -95,7 +95,7 @@ const marksSchema = new mongoose.Schema(
 marksSchema.pre('save', function (next) {
   const { cia1, cia2, cia3, assignment } = this.internalMarks;
   this.internalMarks.totalInternal = cia1 + cia2 + cia3 + assignment;
-  next();
+  
 });
 
 // Index for faster queries
