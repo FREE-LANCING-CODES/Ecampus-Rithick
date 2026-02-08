@@ -92,10 +92,9 @@ const marksSchema = new mongoose.Schema(
 );
 
 // Calculate total internal marks before saving
-marksSchema.pre('save', function (next) {
+marksSchema.pre('save', function () {
   const { cia1, cia2, cia3, assignment } = this.internalMarks;
   this.internalMarks.totalInternal = cia1 + cia2 + cia3 + assignment;
-  
 });
 
 // Index for faster queries
