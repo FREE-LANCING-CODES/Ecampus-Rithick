@@ -27,13 +27,13 @@ const ManageStudents = () => {
     name: '',
     email: '',
     phone: '',
+    dateOfBirth: '',
+    gender: 'Male',
+    bloodGroup: 'O+',
     department: 'B.Sc Computer Science',
     year: 1,
     semester: 1,
     rollNumber: '',
-    gender: 'Male',
-    bloodGroup: 'O+',
-    dateOfBirth: '',
   });
 
   useEffect(() => {
@@ -60,13 +60,13 @@ const ManageStudents = () => {
       name: '',
       email: '',
       phone: '',
+      dateOfBirth: '',
+      gender: 'Male',
+      bloodGroup: 'O+',
       department: 'B.Sc Computer Science',
       year: 1,
       semester: 1,
       rollNumber: '',
-      gender: 'Male',
-      bloodGroup: 'O+',
-      dateOfBirth: '',
     });
     setShowModal(true);
   };
@@ -80,23 +80,23 @@ const ManageStudents = () => {
       name: student.name,
       email: student.email,
       phone: student.phone || '',
+      dateOfBirth: student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().split('T')[0] : '',
+      gender: student.gender || 'Male',
+      bloodGroup: student.bloodGroup || 'O+',
       department: student.department,
       year: student.year,
       semester: student.semester,
       rollNumber: student.rollNumber || '',
-      gender: student.gender || 'Male',
-      bloodGroup: student.bloodGroup || 'O+',
-      dateOfBirth: student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().split('T')[0] : '',
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Delete ${name}? This will also delete all related records!`)) return;
+    if (!window.confirm(`Delete ${name}? This will delete all related records!`)) return;
 
     try {
       await adminAPI.deleteStudent(id);
-      setMessage({ type: 'success', text: 'Student deleted successfully!' });
+      setMessage({ type: 'success', text: '✅ Student deleted successfully!' });
       fetchStudents();
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
@@ -110,10 +110,10 @@ const ManageStudents = () => {
     try {
       if (editMode) {
         await adminAPI.updateStudent(currentStudent._id, formData);
-        setMessage({ type: 'success', text: 'Student updated successfully!' });
+        setMessage({ type: 'success', text: '✅ Student updated successfully!' });
       } else {
         await adminAPI.addStudent(formData);
-        setMessage({ type: 'success', text: 'Student added successfully!' });
+        setMessage({ type: 'success', text: '✅ Student added successfully!' });
       }
       
       setShowModal(false);
@@ -135,9 +135,9 @@ const ManageStudents = () => {
       <DashboardLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="relative">
-            <div className="w-20 h-20 border-4 border-red-600/30 border-t-red-600 rounded-full animate-spin"></div>
+            <div className="w-20 h-20 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Activity className="w-8 h-8 text-red-600 animate-pulse" />
+              <Activity className="w-8 h-8 text-blue-600 animate-pulse" />
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@ const ManageStudents = () => {
           </div>
           <button
             onClick={handleAdd}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/50 transition-all"
           >
             <Plus className="w-5 h-5" />
             Add Student
@@ -175,7 +175,7 @@ const ManageStudents = () => {
         )}
 
         {/* Search */}
-        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+        <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl p-4 border border-gray-800">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -183,13 +183,13 @@ const ManageStudents = () => {
               placeholder="Search by name, user ID, or roll number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
         {/* Table */}
-        <div className="bg-gray-900/50 rounded-xl border border-gray-800 overflow-hidden">
+        <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-800/50">
@@ -198,7 +198,6 @@ const ManageStudents = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">User ID</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Roll Number</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Year/Sem</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Contact</th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Actions</th>
                 </tr>
               </thead>
@@ -207,7 +206,7 @@ const ManageStudents = () => {
                   <tr key={student._id} className="hover:bg-gray-800/30">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/50">
                           {student.name.charAt(0)}
                         </div>
                         <div>
@@ -219,7 +218,6 @@ const ManageStudents = () => {
                     <td className="px-6 py-4 text-white">{student.userId}</td>
                     <td className="px-6 py-4 text-white">{student.rollNumber || 'N/A'}</td>
                     <td className="px-6 py-4 text-white">Year {student.year}, Sem {student.semester}</td>
-                    <td className="px-6 py-4 text-white">{student.phone || 'N/A'}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         <button
@@ -245,63 +243,62 @@ const ManageStudents = () => {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-900 rounded-xl border border-gray-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 w-full max-w-3xl my-8">
               <div className="p-6 border-b border-gray-800 flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">
-                  {editMode ? 'Edit Student' : 'Add New Student'}
-                </h3>
+                <h3 className="text-xl font-bold text-white">{editMode ? 'Edit Student' : 'Add New Student'}</h3>
                 <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">User ID *</label>
                     <input
                       type="text"
                       required
                       disabled={editMode}
                       value={formData.userId}
                       onChange={(e) => setFormData({...formData, userId: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      placeholder="e.g., BSC2022010"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </div>
 
                   {!editMode && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Password *</label>
                       <input
                         type="password"
-                        required={!editMode}
+                        required
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Full Name *</label>
                     <input
                       type="text"
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Email *</label>
                     <input
                       type="email"
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -311,7 +308,7 @@ const ManageStudents = () => {
                       type="text"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -321,7 +318,18 @@ const ManageStudents = () => {
                       type="text"
                       value={formData.rollNumber}
                       onChange={(e) => setFormData({...formData, rollNumber: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Department *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.department}
+                      onChange={(e) => setFormData({...formData, department: e.target.value})}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -330,12 +338,11 @@ const ManageStudents = () => {
                     <select
                       value={formData.year}
                       onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="1">Year 1</option>
-                      <option value="2">Year 2</option>
-                      <option value="3">Year 3</option>
-                      <option value="4">Year 4</option>
+                      {[1,2,3,4].map(y => (
+                        <option key={y} value={y}>Year {y}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -344,10 +351,10 @@ const ManageStudents = () => {
                     <select
                       value={formData.semester}
                       onChange={(e) => setFormData({...formData, semester: parseInt(e.target.value)})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
-                      {[1,2,3,4,5,6,7,8].map(sem => (
-                        <option key={sem} value={sem}>Semester {sem}</option>
+                      {[1,2,3,4,5,6,7,8].map(s => (
+                        <option key={s} value={s}>Semester {s}</option>
                       ))}
                     </select>
                   </div>
@@ -357,7 +364,7 @@ const ManageStudents = () => {
                     <select
                       value={formData.gender}
                       onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -370,16 +377,27 @@ const ManageStudents = () => {
                     <select
                       value={formData.bloodGroup}
                       onChange={(e) => setFormData({...formData, bloodGroup: e.target.value})}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500"
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       {['A+','A-','B+','B-','O+','O-','AB+','AB-'].map(bg => (
                         <option key={bg} value={bg}>{bg}</option>
                       ))}
                     </select>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
+                    <input
+                      type="date"
+                      value={formData.dateOfBirth}
+                      onChange={(e) => setFormData({...formData, dateOfBirth: e.target.value})}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4">
+                {/* Submit */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
@@ -389,7 +407,7 @@ const ManageStudents = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                    className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/50 transition-all"
                   >
                     <Save className="w-4 h-4" />
                     {editMode ? 'Update' : 'Add'} Student

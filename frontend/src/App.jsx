@@ -10,10 +10,11 @@ import FacultyDashboard from './pages/FacultyDashboard';
 import ViewStudents from './pages/ViewStudents';
 import MarkAttendance from './pages/MarkAttendance';
 import EnterMarks from './pages/EnterMarks';
-import useAuthStore from './store/authStore';
 import AdminDashboard from './pages/AdminDashboard';
 import ManageStudents from './pages/ManageStudents';
 import ManageFaculty from './pages/ManageFaculty';
+import useAuthStore from './store/authStore';
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -31,12 +32,17 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate to={useAuthStore.getState().user?.role === 'faculty' ? '/faculty/dashboard' : '/dashboard'} />
+              <Navigate to={
+                useAuthStore.getState().user?.role === 'admin' ? '/admin/dashboard' :
+                useAuthStore.getState().user?.role === 'faculty' ? '/faculty/dashboard' : 
+                '/dashboard'
+              } />
             ) : (
               <Login />
             )
           }
         />
+
         {/* Student Protected Routes */}
         <Route
           path="/dashboard"
@@ -120,7 +126,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* Admin Routes */}
+
+        {/* Admin Protected Routes */}
         <Route
           path="/admin/dashboard"
           element={
@@ -129,7 +136,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
+        <Route
           path="/admin/students"
           element={
             <ProtectedRoute>
@@ -144,10 +151,21 @@ function App() {
               <ManageFaculty />
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* Default Route */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
+        <Route 
+          path="*" 
+          element={
+            <Navigate to={
+              isAuthenticated ? (
+                useAuthStore.getState().user?.role === 'admin' ? '/admin/dashboard' :
+                useAuthStore.getState().user?.role === 'faculty' ? '/faculty/dashboard' :
+                '/dashboard'
+              ) : '/login'
+            } />
+          } 
+        />
       </Routes>
     </Router>
   );
