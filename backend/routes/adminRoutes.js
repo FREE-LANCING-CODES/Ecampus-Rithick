@@ -13,19 +13,19 @@ const {
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 
-// Protect all admin routes
+// Protect all routes
 router.use(protect);
 
-// Dashboard Stats
+// Stats
 router.get('/stats', getStats);
 
-// Student Management
+// Students
 router.get('/students', getAllStudents);
 router.post('/students', addStudent);
 router.put('/students/:id', updateStudent);
 router.delete('/students/:id', deleteStudent);
 
-// Faculty Management
+// Faculty
 router.get('/faculty', getAllFaculty);
 router.post('/faculty', addFaculty);
 router.put('/faculty/:id', updateFaculty);

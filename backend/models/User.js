@@ -68,6 +68,30 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    
+    // ========== NEW FACULTY FIELDS - ADDED ==========
+    qualification: {
+      type: String,
+    },
+    specialization: {
+      type: String,
+    },
+    yearsOfExperience: {
+      type: Number,
+    },
+    designation: {
+      type: String,
+    },
+    dateOfJoining: {
+      type: Date,
+    },
+    officeRoom: {
+      type: String,
+    },
+    profilePhoto: {
+      type: String,
+    },
+    // ================================================
   },
   {
     timestamps: true, // createdAt, updatedAt auto add aagum
@@ -78,12 +102,13 @@ const userSchema = new mongoose.Schema(
 userSchema.pre('save', async function (next) {
   // Password change aagala na skip pannu
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
   // Password hash (encrypt) pannu
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // JWT Token generate panradhu
