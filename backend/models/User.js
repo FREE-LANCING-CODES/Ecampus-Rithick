@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'Please provide password'],
-      minlength: 6,
+      minlength: 1,
       select: false, // Password return panna koodadhu by default
     },
     role: {
@@ -99,17 +99,17 @@ const userSchema = new mongoose.Schema(
 );
 
 // Password encrypt panradhu - Save pannumbodhu
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // Password change aagala na skip pannu
   if (!this.isModified('password')) {
-    return next();
+    return;
   }
 
   // Password hash (encrypt) pannu
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
+
 
 // JWT Token generate panradhu
 userSchema.methods.getSignedJwtToken = function () {
