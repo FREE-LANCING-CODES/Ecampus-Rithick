@@ -5,7 +5,8 @@ import { GraduationCap, Lock, User, AlertCircle } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, loading, error, clearError, setError } = useAuthStore();
+  const { login, loading, error, clearError } = useAuthStore();
+  const [localError, setLocalError] = useState(null);
 
   const [selectedRole, setSelectedRole] = useState('student');
   const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ const Login = () => {
       [e.target.name]: e.target.value,
     });
     clearError();
+    setLocalError(null);
   };
 
   const handleSubmit = async (e) => {
@@ -45,7 +47,7 @@ const Login = () => {
           errorMessage = '❌ This is Admin Login. Please use Student or Faculty login page.';
         }
         
-        setError(errorMessage);
+        setLocalError(errorMessage);
         return; // Stop here, don't redirect
       }
 
@@ -94,6 +96,7 @@ const Login = () => {
             onClick={() => {
               setSelectedRole('student');
               clearError();
+              setLocalError(null);
             }}
             className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'student'
@@ -107,6 +110,7 @@ const Login = () => {
             onClick={() => {
               setSelectedRole('faculty');
               clearError();
+              setLocalError(null);
             }}
             className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'faculty'
@@ -120,6 +124,7 @@ const Login = () => {
             onClick={() => {
               setSelectedRole('admin');
               clearError();
+              setLocalError(null);
             }}
             className={`px-4 py-3 rounded-lg font-medium transition-all ${
               selectedRole === 'admin'
@@ -134,10 +139,10 @@ const Login = () => {
         {/* Glass Card */}
         <div className="bg-gradient-to-b from-gray-900/50 to-gray-900/30 backdrop-blur-xl rounded-2xl p-8 border border-gray-800/50 shadow-2xl">
           {/* Error Message */}
-          {error && (
+          {(error || localError) && (
             <div className="mb-6 bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg flex items-center gap-2 animate-shake">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{error}</span>
+              <span className="text-sm">{error || localError}</span>
             </div>
           )}
 
@@ -161,8 +166,8 @@ const Login = () => {
                     selectedRole === 'student' 
                       ? 'e.g. BSC2022001' 
                       : selectedRole === 'faculty'
-                      ? 'e.g. FAC001'
-                      : 'e.g. ADMIN001'
+                      ? 'e.g. dhivya476'
+                      : 'e.g. admin'
                   }
                   className="block w-full pl-10 pr-3 py-3 bg-gray-900/50 border border-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
                 />
