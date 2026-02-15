@@ -16,10 +16,6 @@ import {
   BookOpen,
   Clock,
   CheckCircle2,
-  Settings,
-  Lock,
-  Bell,
-  Eye,
   Download,
   Share2,
   Activity,
@@ -29,7 +25,7 @@ import {
 
 const Profile = () => {
   const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState('overview'); // overview, academic, settings
+  const [activeTab, setActiveTab] = useState('overview'); // overview, academic
 
   const personalInfo = [
     { label: 'Full Name', value: user?.name, icon: User, color: 'blue' },
@@ -91,15 +87,11 @@ const Profile = () => {
                   <Download className="w-4 h-4" />
                   Export
                 </button>
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-600 hover:bg-blue-50 rounded-xl transition-all font-semibold hover:scale-105 shadow-lg">
-                  <Edit className="w-4 h-4" />
-                  Edit Profile
-                </button>
               </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex gap-2 bg-white/10 backdrop-blur-xl p-1.5 rounded-xl border border-white/20">
+            {/* Navigation Tabs - ONLY 2 TABS NOW */}
+            <div className="flex gap-2 bg-white/10 backdrop-blur-xl p-1.5 rounded-xl border border-white/20 max-w-md">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`flex-1 px-6 py-2.5 rounded-lg font-medium transition-all ${
@@ -119,16 +111,6 @@ const Profile = () => {
                 }`}
               >
                 Academic
-              </button>
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`flex-1 px-6 py-2.5 rounded-lg font-medium transition-all ${
-                  activeTab === 'settings'
-                    ? 'bg-white text-blue-600 shadow-lg'
-                    : 'text-white hover:bg-white/10'
-                }`}
-              >
-                Settings
               </button>
             </div>
           </div>
@@ -187,9 +169,6 @@ const Profile = () => {
                     <button className="p-3 bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-xl border border-white/20 transition-all hover:scale-110">
                       <Share2 className="w-5 h-5 text-white" />
                     </button>
-                    <button className="p-3 bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-xl border border-white/20 transition-all hover:scale-110">
-                      <Eye className="w-5 h-5 text-white" />
-                    </button>
                   </div>
                 </div>
               </div>
@@ -198,11 +177,19 @@ const Profile = () => {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-6 bg-gray-800/30">
                 {quickStats.map((stat, index) => {
                   const Icon = stat.icon;
+                  const colorMap = {
+                    green: { bg: 'bg-green-500/20', text: 'text-green-400' },
+                    blue: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+                    purple: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
+                    yellow: { bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
+                  };
+                  const colors = colorMap[stat.color];
+                  
                   return (
                     <div key={index} className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 hover:border-gray-600 transition-all group hover:scale-105">
                       <div className="flex items-center justify-between mb-2">
-                        <div className={`p-2 rounded-lg bg-${stat.color}-500/20`}>
-                          <Icon className={`w-4 h-4 text-${stat.color}-400`} />
+                        <div className={`p-2 rounded-lg ${colors.bg}`}>
+                          <Icon className={`w-4 h-4 ${colors.text}`} />
                         </div>
                         <span className="text-xs text-green-400 font-semibold">{stat.trend}</span>
                       </div>
@@ -225,11 +212,21 @@ const Profile = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {personalInfo.map((info, index) => {
                     const Icon = info.icon;
+                    const colorMap = {
+                      blue: { bg: 'bg-blue-500/5', border: 'border-blue-500/20', iconBg: 'bg-blue-500/20', iconText: 'text-blue-400', hover: 'hover:border-blue-500/40' },
+                      purple: { bg: 'bg-purple-500/5', border: 'border-purple-500/20', iconBg: 'bg-purple-500/20', iconText: 'text-purple-400', hover: 'hover:border-purple-500/40' },
+                      green: { bg: 'bg-green-500/5', border: 'border-green-500/20', iconBg: 'bg-green-500/20', iconText: 'text-green-400', hover: 'hover:border-green-500/40' },
+                      yellow: { bg: 'bg-yellow-500/5', border: 'border-yellow-500/20', iconBg: 'bg-yellow-500/20', iconText: 'text-yellow-400', hover: 'hover:border-yellow-500/40' },
+                      red: { bg: 'bg-red-500/5', border: 'border-red-500/20', iconBg: 'bg-red-500/20', iconText: 'text-red-400', hover: 'hover:border-red-500/40' },
+                      pink: { bg: 'bg-pink-500/5', border: 'border-pink-500/20', iconBg: 'bg-pink-500/20', iconText: 'text-pink-400', hover: 'hover:border-pink-500/40' },
+                    };
+                    const colors = colorMap[info.color];
+                    
                     return (
-                      <div key={index} className={`bg-${info.color}-500/5 rounded-xl p-5 border border-${info.color}-500/20 hover:border-${info.color}-500/40 transition-all group`}>
+                      <div key={index} className={`${colors.bg} rounded-xl p-5 border ${colors.border} ${colors.hover} transition-all group`}>
                         <div className="flex items-center gap-3 mb-3">
-                          <div className={`bg-${info.color}-500/20 p-2.5 rounded-lg group-hover:scale-110 transition-transform`}>
-                            <Icon className={`w-5 h-5 text-${info.color}-400`} />
+                          <div className={`${colors.iconBg} p-2.5 rounded-lg group-hover:scale-110 transition-transform`}>
+                            <Icon className={`w-5 h-5 ${colors.iconText}`} />
                           </div>
                           <p className="text-sm font-medium text-gray-400">{info.label}</p>
                         </div>
@@ -248,11 +245,17 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {additionalInfo.map((info, index) => {
                       const Icon = info.icon;
+                      const colorMap = {
+                        red: { bg: 'bg-red-500/5', border: 'border-red-500/20', iconBg: 'bg-red-500/20', iconText: 'text-red-400', hover: 'hover:border-red-500/40' },
+                        blue: { bg: 'bg-blue-500/5', border: 'border-blue-500/20', iconBg: 'bg-blue-500/20', iconText: 'text-blue-400', hover: 'hover:border-blue-500/40' },
+                      };
+                      const colors = colorMap[info.color];
+                      
                       return (
-                        <div key={index} className={`bg-${info.color}-500/5 rounded-xl p-5 border border-${info.color}-500/20 hover:border-${info.color}-500/40 transition-all`}>
+                        <div key={index} className={`${colors.bg} rounded-xl p-5 border ${colors.border} ${colors.hover} transition-all`}>
                           <div className="flex items-center gap-3 mb-3">
-                            <div className={`bg-${info.color}-500/20 p-2.5 rounded-lg`}>
-                              <Icon className={`w-5 h-5 text-${info.color}-400`} />
+                            <div className={`${colors.iconBg} p-2.5 rounded-lg`}>
+                              <Icon className={`w-5 h-5 ${colors.iconText}`} />
                             </div>
                             <p className="text-sm font-medium text-gray-400">{info.label}</p>
                           </div>
@@ -273,11 +276,18 @@ const Profile = () => {
                 <div className="space-y-3">
                   {recentActivity.map((activity, index) => {
                     const Icon = activity.icon;
+                    const colorMap = {
+                      green: { bg: 'bg-green-500/20', text: 'text-green-400' },
+                      blue: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+                      purple: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
+                    };
+                    const colors = colorMap[activity.color];
+                    
                     return (
                       <div key={index} className="bg-gray-800/50 rounded-xl p-4 border border-gray-700 hover:border-gray-600 transition-all group">
                         <div className="flex items-start gap-3">
-                          <div className={`bg-${activity.color}-500/20 p-2 rounded-lg flex-shrink-0 group-hover:scale-110 transition-transform`}>
-                            <Icon className={`w-4 h-4 text-${activity.color}-400`} />
+                          <div className={`${colors.bg} p-2 rounded-lg flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                            <Icon className={`w-4 h-4 ${colors.text}`} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-white text-sm">{activity.action}</p>
@@ -411,82 +421,26 @@ const Profile = () => {
                   { sem: 'Semester 3', status: 'Completed - SGPA: 8.6', color: 'blue' },
                   { sem: 'Semester 2', status: 'Completed - SGPA: 8.4', color: 'blue' },
                   { sem: 'Semester 1', status: 'Completed - SGPA: 8.2', color: 'blue' },
-                ].map((item, index) => (
-                  <div key={index} className={`bg-${item.color}-500/5 border border-${item.color}-500/20 rounded-xl p-4 flex items-center gap-4`}>
-                    <div className={`bg-${item.color}-500/20 p-3 rounded-lg`}>
-                      <GraduationCap className={`w-5 h-5 text-${item.color}-400`} />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-white">{item.sem}</p>
-                      <p className="text-sm text-gray-400">{item.status}</p>
-                    </div>
-                    <CheckCircle2 className={`w-5 h-5 text-${item.color}-400`} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Settings Tab */}
-        {activeTab === 'settings' && (
-          <div className="space-y-6">
-            {/* Privacy & Security */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-900/50 rounded-2xl border border-gray-800 p-6 shadow-xl">
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Lock className="w-6 h-6 text-red-500" />
-                Privacy & Security
-              </h3>
-              <div className="space-y-4">
-                {[
-                  { label: 'Change Password', desc: 'Update your account password', icon: Lock },
-                  { label: 'Two-Factor Authentication', desc: 'Add an extra layer of security', icon: Shield },
-                  { label: 'Login History', desc: 'View recent login activity', icon: Clock },
-                  { label: 'Privacy Settings', desc: 'Manage your privacy preferences', icon: Eye },
-                ].map((setting, index) => {
-                  const Icon = setting.icon;
+                ].map((item, index) => {
+                  const colorMap = {
+                    green: { bg: 'bg-green-500/5', border: 'border-green-500/20', iconBg: 'bg-green-500/20', iconText: 'text-green-400' },
+                    blue: { bg: 'bg-blue-500/5', border: 'border-blue-500/20', iconBg: 'bg-blue-500/20', iconText: 'text-blue-400' },
+                  };
+                  const colors = colorMap[item.color];
+                  
                   return (
-                    <div key={index} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 hover:border-gray-600 transition-all flex items-center justify-between group cursor-pointer">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-blue-500/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
-                          <Icon className="w-5 h-5 text-blue-400" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-white">{setting.label}</p>
-                          <p className="text-sm text-gray-400">{setting.desc}</p>
-                        </div>
+                    <div key={index} className={`${colors.bg} border ${colors.border} rounded-xl p-4 flex items-center gap-4`}>
+                      <div className={`${colors.iconBg} p-3 rounded-lg`}>
+                        <GraduationCap className={`w-5 h-5 ${colors.iconText}`} />
                       </div>
-                      <Settings className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-white">{item.sem}</p>
+                        <p className="text-sm text-gray-400">{item.status}</p>
+                      </div>
+                      <CheckCircle2 className={`w-5 h-5 ${colors.iconText}`} />
                     </div>
                   );
                 })}
-              </div>
-            </div>
-
-            {/* Notifications */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-900/50 rounded-2xl border border-gray-800 p-6 shadow-xl">
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Bell className="w-6 h-6 text-yellow-500" />
-                Notification Preferences
-              </h3>
-              <div className="space-y-4">
-                {[
-                  { label: 'Email Notifications', desc: 'Receive updates via email' },
-                  { label: 'SMS Notifications', desc: 'Get SMS alerts for important events' },
-                  { label: 'Push Notifications', desc: 'Browser push notifications' },
-                  { label: 'Attendance Alerts', desc: 'Get notified about attendance updates' },
-                ].map((notif, index) => (
-                  <div key={index} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-white">{notif.label}</p>
-                      <p className="text-sm text-gray-400">{notif.desc}</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                ))}
               </div>
             </div>
           </div>

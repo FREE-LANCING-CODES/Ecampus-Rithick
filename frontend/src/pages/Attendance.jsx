@@ -18,8 +18,6 @@ import {
 import { 
   LineChart, 
   Line, 
-  BarChart, 
-  Bar, 
   PieChart, 
   Pie, 
   Cell,
@@ -27,14 +25,13 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  Legend,
   ResponsiveContainer 
 } from 'recharts';
 
 const Attendance = () => {
   const [attendance, setAttendance] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedView, setSelectedView] = useState('overview');
+  const [selectedView, setSelectedView] = useState('overview'); // overview, subjects only
 
   useEffect(() => {
     fetchAttendance();
@@ -52,7 +49,7 @@ const Attendance = () => {
     }
   };
 
-  // ✅ FIXED: Calculate REAL attendance percentage dynamically
+  // ✅ Calculate REAL attendance percentage dynamically
   const calculatePercentage = (attended, total) => {
     if (!total || total === 0) return 0;
     return Math.round((attended / total) * 100);
@@ -70,7 +67,6 @@ const Attendance = () => {
     };
 
     attendance.subjectWise.forEach(subject => {
-      // ✅ RECALCULATE to ensure accuracy
       const percentage = calculatePercentage(subject.attended, subject.totalClasses);
       
       if (percentage >= 90) stats.excellent++;
@@ -93,9 +89,8 @@ const Attendance = () => {
     ].filter(item => item.value > 0);
   };
 
-  // ✅ FIXED: Get REAL attendance trend (use actual data)
+  // Get attendance trend
   const getAttendanceTrend = () => {
-    // For now, show current month data (can be enhanced to show historical data)
     const currentPercentage = attendance?.overall?.percentage || 0;
     
     return [
@@ -140,11 +135,11 @@ const Attendance = () => {
                 </p>
               </div>
               
-              {/* View Tabs */}
-              <div className="flex gap-2 bg-white/10 backdrop-blur-xl p-1.5 rounded-xl border border-white/20">
+              {/* View Tabs - ONLY 2 TABS */}
+              <div className="flex gap-2 bg-white/10 backdrop-blur-xl p-1.5 rounded-xl border border-white/20 max-w-md">
                 <button
                   onClick={() => setSelectedView('overview')}
-                  className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+                  className={`flex-1 px-6 py-2.5 rounded-lg font-medium transition-all ${
                     selectedView === 'overview'
                       ? 'bg-white text-blue-600 shadow-lg'
                       : 'text-white hover:bg-white/10'
@@ -154,23 +149,13 @@ const Attendance = () => {
                 </button>
                 <button
                   onClick={() => setSelectedView('subjects')}
-                  className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+                  className={`flex-1 px-6 py-2.5 rounded-lg font-medium transition-all ${
                     selectedView === 'subjects'
                       ? 'bg-white text-blue-600 shadow-lg'
                       : 'text-white hover:bg-white/10'
                   }`}
                 >
                   Subjects
-                </button>
-                <button
-                  onClick={() => setSelectedView('analytics')}
-                  className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
-                    selectedView === 'analytics'
-                      ? 'bg-white text-blue-600 shadow-lg'
-                      : 'text-white hover:bg-white/10'
-                  }`}
-                >
-                  Analytics
                 </button>
               </div>
             </div>
@@ -182,7 +167,7 @@ const Attendance = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Overall Attendance - ✅ DYNAMIC */}
+          {/* Overall Attendance */}
           <div className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-xl rounded-2xl p-6 border border-blue-500/20 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group hover:scale-105">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg">
@@ -335,7 +320,7 @@ const Attendance = () => {
           </div>
         )}
 
-        {/* Subject-wise Attendance - ✅ FIXED WITH DYNAMIC CALCULATION */}
+        {/* Subject-wise Attendance */}
         {(selectedView === 'subjects' || selectedView === 'overview') && (
           <div className="bg-gradient-to-b from-gray-900 to-gray-900/50 rounded-2xl border border-gray-800 backdrop-blur-xl overflow-hidden shadow-xl">
             <div className="p-6 border-b border-gray-800">
@@ -349,7 +334,6 @@ const Attendance = () => {
               {attendance?.subjectWise?.length > 0 ? (
                 <div className="space-y-4">
                   {attendance.subjectWise.map((subject, index) => {
-                    // ✅ RECALCULATE percentage dynamically!
                     const percentage = calculatePercentage(subject.attended, subject.totalClasses);
                     
                     const getStatusColor = (pct) => {
@@ -438,149 +422,6 @@ const Attendance = () => {
                   <p className="text-gray-600 text-sm mt-2">Your attendance will appear here once marked</p>
                 </div>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* Analytics View */}
-        {selectedView === 'analytics' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Bar Chart - Subject Comparison */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-900/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-800 shadow-xl">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <BarChart3 className="w-6 h-6 text-blue-500" />
-                Subject Comparison
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={attendance?.subjectWise?.map(s => ({
-                  ...s,
-                  percentage: calculatePercentage(s.attended, s.totalClasses)
-                })) || []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis 
-                    dataKey="subjectCode" 
-                    stroke="#9ca3af"
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis domain={[0, 100]} stroke="#9ca3af" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      border: '1px solid #374151', 
-                      borderRadius: '12px' 
-                    }}
-                    labelStyle={{ color: '#fff' }}
-                  />
-                  <Bar dataKey="percentage" radius={[8, 8, 0, 0]}>
-                    {attendance?.subjectWise?.map((entry, index) => {
-                      const pct = calculatePercentage(entry.attended, entry.totalClasses);
-                      return (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={
-                            pct >= 90 ? '#10b981' :
-                            pct >= 75 ? '#3b82f6' :
-                            pct >= 65 ? '#f59e0b' : '#ef4444'
-                          } 
-                        />
-                      );
-                    })}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Insights & Recommendations */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-900/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-800 shadow-xl">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <Info className="w-6 h-6 text-purple-500" />
-                Insights & Tips
-              </h3>
-              <div className="space-y-4">
-                {/* Overall Status */}
-                <div className={`p-4 rounded-xl border ${
-                  calculatePercentage(attendance?.overall?.attended, attendance?.overall?.totalClasses) >= 75
-                    ? 'bg-green-500/10 border-green-500/20' 
-                    : 'bg-red-500/10 border-red-500/20'
-                }`}>
-                  <div className="flex items-start gap-3">
-                    {calculatePercentage(attendance?.overall?.attended, attendance?.overall?.totalClasses) >= 75 ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-red-400 mt-0.5" />
-                    )}
-                    <div>
-                      <p className={`font-semibold ${
-                        calculatePercentage(attendance?.overall?.attended, attendance?.overall?.totalClasses) >= 75 
-                          ? 'text-green-400' : 'text-red-400'
-                      }`}>
-                        Overall Status
-                      </p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        {calculatePercentage(attendance?.overall?.attended, attendance?.overall?.totalClasses) >= 75
-                          ? 'You meet the minimum attendance requirement of 75%' 
-                          : 'Your attendance is below the required 75% threshold'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Best Performing */}
-                {attendance?.subjectWise?.length > 0 && (
-                  <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                    <div className="flex items-start gap-3">
-                      <Award className="w-5 h-5 text-blue-400 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-blue-400">Best Performance</p>
-                        <p className="text-sm text-gray-400 mt-1">
-                          {(() => {
-                            const best = [...attendance.subjectWise].sort((a, b) => 
-                              calculatePercentage(b.attended, b.totalClasses) - 
-                              calculatePercentage(a.attended, a.totalClasses)
-                            )[0];
-                            return `${best.subjectName} (${calculatePercentage(best.attended, best.totalClasses)}%)`;
-                          })()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Needs Improvement */}
-                {attendance?.subjectWise?.some(s => calculatePercentage(s.attended, s.totalClasses) < 75) && (
-                  <div className="p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-yellow-400">Needs Attention</p>
-                        <p className="text-sm text-gray-400 mt-1">
-                          {attendance.subjectWise.filter(s => 
-                            calculatePercentage(s.attended, s.totalClasses) < 75
-                          ).length} subject(s) below 75%
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Quick Tips */}
-                <div className="p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                  <div className="flex items-start gap-3">
-                    <Target className="w-5 h-5 text-purple-400 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-purple-400">Pro Tips</p>
-                      <ul className="text-sm text-gray-400 mt-2 space-y-1.5">
-                        <li>• Maintain at least 75% to avoid academic issues</li>
-                        <li>• Set reminders for important classes</li>
-                        <li>• Track your attendance weekly</li>
-                        <li>• Communicate with faculty for genuine reasons</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
