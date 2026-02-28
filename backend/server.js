@@ -47,11 +47,14 @@ mongoose
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const adminFeeRoutes = require('./routes/adminFeeRoute');
 
+// Routes
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/faculty', require('./routes/facultyRoutes'));
+app.use('/api/admin/fees', adminFeeRoutes);
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Test Route
