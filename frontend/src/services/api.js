@@ -24,7 +24,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -72,23 +71,25 @@ export const facultyAPI = {
   enterMarks: (data) => api.post('/faculty/marks', data),
   getMarksBySubject: (subjectCode) => api.get(`/faculty/marks/${subjectCode}`),
 };
+
 // ============ ADMIN APIs ============
 export const adminAPI = {
   // Dashboard
   getStats: () => api.get('/admin/stats'),
-  
+
   // Students
   getStudents: () => api.get('/admin/students'),
   addStudent: (data) => api.post('/admin/students', data),
   updateStudent: (id, data) => api.put(`/admin/students/${id}`, data),
   deleteStudent: (id) => api.delete(`/admin/students/${id}`),
-  
+  resetPassword: (id, data) => api.put(`/admin/reset-password/${id}`, data),
+
   // Faculty
   getFaculty: () => api.get('/admin/faculty'),
   addFaculty: (data) => api.post('/admin/faculty', data),
   updateFaculty: (id, data) => api.put(`/admin/faculty/${id}`, data),
   deleteFaculty: (id) => api.delete(`/admin/faculty/${id}`),
-  
+
   // Fees
   getAllFees: () => api.get('/admin/fees'),
   getFeeStatistics: () => api.get('/admin/fees/statistics'),

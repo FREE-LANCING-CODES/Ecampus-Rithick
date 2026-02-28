@@ -11,10 +11,7 @@ import {
   Award,
   Activity,
   Filter,
-  Download,
-  Eye,
-  TrendingUp,
-  BookOpen
+  Download
 } from 'lucide-react';
 
 const ViewStudents = () => {
@@ -39,7 +36,6 @@ const ViewStudents = () => {
     }
   };
 
-  // Filter and sort students
   const filteredStudents = students
     .filter((student) => {
       const matchesSearch = 
@@ -58,7 +54,6 @@ const ViewStudents = () => {
       return 0;
     });
 
-  // Stats
   const stats = [
     {
       name: 'Total Students',
@@ -178,7 +173,6 @@ const ViewStudents = () => {
         {/* Filters and Search */}
         <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl p-6 border border-gray-800 shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-300 mb-2">Search Students</label>
               <div className="relative">
@@ -193,7 +187,6 @@ const ViewStudents = () => {
               </div>
             </div>
 
-            {/* Filter by Gender */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Filter by Gender</label>
               <div className="relative">
@@ -212,7 +205,6 @@ const ViewStudents = () => {
             </div>
           </div>
 
-          {/* Sort Options */}
           <div className="mt-4 flex items-center gap-2">
             <span className="text-sm text-gray-400">Sort by:</span>
             <button
@@ -278,9 +270,6 @@ const ViewStudents = () => {
                     <h3 className="font-semibold text-white text-lg truncate">{student.name}</h3>
                     <p className="text-sm text-gray-400">{student.userId}</p>
                   </div>
-                  <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all opacity-0 group-hover:opacity-100">
-                    <Eye className="w-4 h-4 text-gray-400" />
-                  </button>
                 </div>
 
                 {/* Student Details */}

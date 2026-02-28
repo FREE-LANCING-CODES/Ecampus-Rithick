@@ -29,9 +29,16 @@ const Fees = () => {
   const fetchFeeDetails = async () => {
     try {
       const response = await studentAPI.getFees();
-      setFeeDetails(response.data.data);
+      // ✅ FIX - API returns { overall, semesterWise } - take latest semester
+      const data = response.data.data;
+      if (data?.semesterWise && data.semesterWise.length > 0) {
+        setFeeDetails(data.semesterWise[0]); // Latest semester first (sorted desc)
+      } else {
+        setFeeDetails(null);
+      }
     } catch (error) {
       console.error('Error fetching fee details:', error);
+      setFeeDetails(null);
     } finally {
       setLoading(false);
     }
@@ -58,6 +65,7 @@ const Fees = () => {
         <div className="text-center py-12">
           <Receipt className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <p className="text-gray-400 text-lg">No fee details available</p>
+          <p className="text-gray-600 text-sm mt-2">Please contact admin to set up your fee structure</p>
         </div>
       </DashboardLayout>
     );
@@ -69,14 +77,13 @@ const Fees = () => {
   const paymentStatus = feeDetails.paymentDetails?.paymentStatus || 'Pending';
   const percentagePaid = totalFee > 0 ? ((amountPaid / totalFee) * 100).toFixed(1) : 0;
 
-  // Stats cards
   const stats = [
     {
       name: 'Total Fee',
       value: `₹${totalFee.toLocaleString()}`,
       icon: Wallet,
       color: 'blue',
-      trend: 'Academic Year 2025-26',
+      trend: `Academic Year ${feeDetails.academicYear || '2025-26'}`,
     },
     {
       name: 'Amount Paid',
@@ -97,17 +104,15 @@ const Fees = () => {
       value: paymentStatus,
       icon: Activity,
       color: paymentStatus === 'Paid' ? 'green' : paymentStatus === 'Partial' ? 'yellow' : 'red',
-      trend: feeDetails.transactions?.length || 0 + ' Transactions',
+      trend: `${feeDetails.transactions?.length || 0} Transactions`,
     },
   ];
 
-  // Pie chart data
   const pieData = [
     { name: 'Paid', value: amountPaid, color: '#10b981' },
     { name: 'Pending', value: amountPending, color: '#dc3545' },
   ];
 
-  // Fee structure chart data
   const feeStructureData = feeDetails.feeStructure ? [
     { name: 'Tuition', amount: feeDetails.feeStructure.tuitionFee },
     { name: 'Exam', amount: feeDetails.feeStructure.examFee },
@@ -148,13 +153,6 @@ const Fees = () => {
     return colors[color] || colors.blue;
   };
 
-  const getPaymentStatusColor = (status) => {
-    if (status === 'Paid') return 'green';
-    if (status === 'Partial') return 'yellow';
-    if (status === 'Pending') return 'red';
-    return 'gray';
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -165,7 +163,7 @@ const Fees = () => {
             <p className="text-gray-400 mt-1">Manage your fee payments and view transaction history</p>
           </div>
           <div className="bg-blue-600/10 border border-blue-500/30 px-4 py-2 rounded-lg">
-            <p className="text-sm text-blue-400 font-medium">Semester 6</p>
+            <p className="text-sm text-blue-400 font-medium">Semester {feeDetails.semester}</p>
           </div>
         </div>
 
@@ -202,7 +200,6 @@ const Fees = () => {
                 Payment Progress
               </h3>
 
-              {/* Circular Progress */}
               <div className="flex items-center justify-center mb-6">
                 <div className="relative">
                   <ResponsiveContainer width={200} height={200}>
@@ -229,7 +226,6 @@ const Fees = () => {
                 </div>
               </div>
 
-              {/* Progress Bar */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-400">Payment Completion</span>
@@ -243,7 +239,6 @@ const Fees = () => {
                 </div>
               </div>
 
-              {/* Summary */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-3 bg-green-600/10 border border-green-500/30 rounded-lg">
                   <div className="flex items-center gap-2">
@@ -261,7 +256,6 @@ const Fees = () => {
                 </div>
               </div>
 
-              {/* Due Date */}
               {feeDetails.paymentDetails?.dueDate && (
                 <div className="mt-6 p-4 bg-yellow-600/10 border border-yellow-500/30 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
@@ -284,7 +278,6 @@ const Fees = () => {
                 Fee Structure Breakdown
               </h3>
 
-              {/* Bar Chart */}
               <div className="mb-6">
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={feeStructureData}>
@@ -305,7 +298,6 @@ const Fees = () => {
                 </ResponsiveContainer>
               </div>
 
-              {/* Fee Items Table */}
               <div className="space-y-2">
                 {feeStructureData.map((item, index) => (
                   <div
@@ -375,7 +367,6 @@ const Fees = () => {
                           </div>
                         </div>
                       </div>
-
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <p className="text-2xl font-bold text-green-400">₹{transaction.amount.toLocaleString()}</p>
@@ -403,7 +394,8 @@ const Fees = () => {
               <div className="flex-1">
                 <h4 className="text-lg font-semibold text-red-400 mb-2">Pending Payment</h4>
                 <p className="text-gray-300 mb-4">
-                  You have a pending amount of <span className="font-bold text-white">₹{amountPending.toLocaleString()}</span>. 
+                  You have a pending amount of{' '}
+                  <span className="font-bold text-white">₹{amountPending.toLocaleString()}</span>.
                   Please complete the payment before the due date to avoid late fees.
                 </p>
                 <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all">

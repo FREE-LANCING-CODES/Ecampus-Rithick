@@ -9,7 +9,8 @@ import {
   Trash2,
   Activity,
   X,
-  Save
+  Save,
+  KeyRound, // ✅ NEW - reset password icon
 } from 'lucide-react';
 
 const ManageStudents = () => {
@@ -17,9 +18,12 @@ const ManageStudents = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false); // ✅ NEW
   const [editMode, setEditMode] = useState(false);
   const [currentStudent, setCurrentStudent] = useState(null);
   const [message, setMessage] = useState(null);
+  const [newPassword, setNewPassword] = useState(''); // ✅ NEW
+  const [showNewPassword, setShowNewPassword] = useState(false); // ✅ NEW
   
   const [formData, setFormData] = useState({
     userId: '',
@@ -89,6 +93,34 @@ const ManageStudents = () => {
       rollNumber: student.rollNumber || '',
     });
     setShowModal(true);
+  };
+
+  // ✅ NEW - Open reset password modal
+  const handleResetPassword = (student) => {
+    setCurrentStudent(student);
+    setNewPassword('');
+    setShowNewPassword(false);
+    setShowResetModal(true);
+  };
+
+  // ✅ NEW - Submit reset password
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+
+    if (newPassword.length < 4) {
+      setMessage({ type: 'error', text: 'Password must be at least 4 characters!' });
+      return;
+    }
+
+    try {
+      await adminAPI.resetPassword(currentStudent._id, { newPassword });
+      setMessage({ type: 'success', text: `✅ Password reset successfully for ${currentStudent.name}!` });
+      setShowResetModal(false);
+      setNewPassword('');
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Error resetting password' });
+    }
   };
 
   const handleDelete = async (id, name) => {
@@ -165,12 +197,15 @@ const ManageStudents = () => {
 
         {/* Message */}
         {message && (
-          <div className={`p-4 rounded-xl ${
+          <div className={`p-4 rounded-xl flex items-center gap-3 ${
             message.type === 'success'
               ? 'bg-green-500/20 text-green-400 border border-green-500/30'
               : 'bg-red-500/20 text-red-400 border border-red-500/30'
           }`}>
-            {message.text}
+            <span>{message.text}</span>
+            <button onClick={() => setMessage(null)} className="ml-auto">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         )}
 
@@ -220,15 +255,27 @@ const ManageStudents = () => {
                     <td className="px-6 py-4 text-white">Year {student.year}, Sem {student.semester}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
+                        {/* Edit */}
                         <button
                           onClick={() => handleEdit(student)}
                           className="p-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg transition-all"
+                          title="Edit Student"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
+                        {/* ✅ NEW - Reset Password */}
+                        <button
+                          onClick={() => handleResetPassword(student)}
+                          className="p-2 bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 rounded-lg transition-all"
+                          title="Reset Password"
+                        >
+                          <KeyRound className="w-4 h-4" />
+                        </button>
+                        {/* Delete */}
                         <button
                           onClick={() => handleDelete(student._id, student.name)}
                           className="p-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-all"
+                          title="Delete Student"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -241,7 +288,7 @@ const ManageStudents = () => {
           </div>
         </div>
 
-        {/* Modal */}
+        {/* Add/Edit Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
             <div className="bg-gray-900 rounded-xl border border-gray-800 w-full max-w-3xl my-8">
@@ -396,7 +443,6 @@ const ManageStudents = () => {
                   </div>
                 </div>
 
-                {/* Submit */}
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
                   <button
                     type="button"
@@ -407,10 +453,89 @@ const ManageStudents = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/50 transition-all"
+                    className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:shadow-lg transition-all"
                   >
                     <Save className="w-4 h-4" />
                     {editMode ? 'Update' : 'Add'} Student
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ✅ NEW - Reset Password Modal */}
+        {showResetModal && currentStudent && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 w-full max-w-md">
+              <div className="p-6 border-b border-gray-800 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <KeyRound className="w-5 h-5 text-yellow-400" />
+                    Reset Password
+                  </h3>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Student: <span className="text-white font-medium">{currentStudent.name}</span>
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    User ID: <span className="text-yellow-400 font-medium">{currentStudent.userId}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleResetSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    New Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-500"
+                      required
+                      minLength={4}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      {showNewPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Minimum 4 characters</p>
+                </div>
+
+                {/* Warning */}
+                <div className="p-3 bg-yellow-600/10 border border-yellow-500/30 rounded-lg">
+                  <p className="text-xs text-yellow-400">
+                    ⚠️ Student ku new password sollunga — next login la use pannuvanga
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="submit"
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                  >
+                    <KeyRound className="w-4 h-4" />
+                    Reset Password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowResetModal(false)}
+                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
+                  >
+                    Cancel
                   </button>
                 </div>
               </form>

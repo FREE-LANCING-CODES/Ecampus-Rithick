@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { GraduationCap, Lock, User, AlertCircle } from 'lucide-react';
+import { GraduationCap, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
   const { login, loading, error, clearError } = useAuthStore();
   const [localError, setLocalError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState('student');
   const [formData, setFormData] = useState({
@@ -29,15 +30,11 @@ const Login = () => {
     const result = await login(formData);
 
     if (result.success) {
-      // Get the actual user role from backend response
       const userRole = result.user?.role || 'student';
 
-      // ROLE VALIDATION - Check if role matches selected tab
       if (selectedRole !== userRole) {
-        // Clear the login (logout immediately)
         useAuthStore.getState().logout();
         
-        // Show appropriate error message
         let errorMessage = '';
         if (selectedRole === 'student') {
           errorMessage = '❌ This is Student Login. Please use Faculty or Admin login page.';
@@ -48,10 +45,9 @@ const Login = () => {
         }
         
         setLocalError(errorMessage);
-        return; // Stop here, don't redirect
+        return;
       }
 
-      // Role matches - redirect to correct dashboard
       if (userRole === 'faculty') {
         navigate('/faculty/dashboard');
       } else if (userRole === 'admin') {
@@ -162,19 +158,13 @@ const Login = () => {
                   value={formData.userId}
                   onChange={handleChange}
                   required
-                  placeholder={
-                    selectedRole === 'student' 
-                      ? 'e.g. BSC2022001' 
-                      : selectedRole === 'faculty'
-                      ? 'e.g. dhivya476'
-                      : 'e.g. admin'
-                  }
+                  placeholder=""
                   className="block w-full pl-10 pr-3 py-3 bg-gray-900/50 border border-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
                 />
               </div>
             </div>
 
-            {/* Password */}
+            {/* Password - WITH EYE ICON */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Password
@@ -184,14 +174,21 @@ const Login = () => {
                   <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-blue-500 transition" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  placeholder="Enter your password"
-                  className="block w-full pl-10 pr-3 py-3 bg-gray-900/50 border border-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
+                  placeholder=""
+                  className="block w-full pl-10 pr-10 py-3 bg-gray-900/50 border border-gray-800 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-500"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
