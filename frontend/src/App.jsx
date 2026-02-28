@@ -13,6 +13,7 @@ import EnterMarks from './pages/EnterMarks';
 import AdminDashboard from './pages/AdminDashboard';
 import ManageStudents from './pages/ManageStudents';
 import ManageFaculty from './pages/ManageFaculty';
+import ManageFees from './pages/ManageFees';
 import useAuthStore from './store/authStore';
 
 // Protected Route Component
@@ -152,6 +153,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin/fees" element={<ProtectedRoute><ManageFees /></ProtectedRoute>} />
 
         {/* Default Route */}
         <Route 

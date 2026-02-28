@@ -44,11 +44,11 @@ const DashboardLayout = ({ children }) => {
   ];
 
   const adminMenuItems = [
-    { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Manage Students', path: '/admin/students', icon: Users },
-    { name: 'Manage Faculty', path: '/admin/faculty', icon: User },
-  ];
-
+  { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Manage Students', path: '/admin/students', icon: Users },
+  { name: 'Manage Faculty', path: '/admin/faculty', icon: User },
+  { name: 'Manage Fees', path: '/admin/fees', icon: DollarSign },
+];
   const menuItems = 
     user?.role === 'admin' ? adminMenuItems :
     user?.role === 'faculty' ? facultyMenuItems : 

@@ -88,6 +88,10 @@ export const adminAPI = {
   addFaculty: (data) => api.post('/admin/faculty', data),
   updateFaculty: (id, data) => api.put(`/admin/faculty/${id}`, data),
   deleteFaculty: (id) => api.delete(`/admin/faculty/${id}`),
+  
+  // Fees
+  getAllFees: () => api.get('/admin/fees'),
+  getFeeStatistics: () => api.get('/admin/fees/statistics'),
+  createOrUpdateFee: (data) => api.post('/admin/fees', data),
+  addPayment: (data) => api.post('/admin/fees/payment', data),
 };
-
-export default api;
