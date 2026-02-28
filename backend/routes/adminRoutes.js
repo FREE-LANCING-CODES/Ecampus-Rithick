@@ -10,6 +10,7 @@ const {
   addFaculty,
   updateFaculty,
   deleteFaculty,
+  resetPassword, // ✅ NEW
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -24,6 +25,9 @@ router.get('/students', getAllStudents);
 router.post('/students', addStudent);
 router.put('/students/:id', updateStudent);
 router.delete('/students/:id', deleteStudent);
+
+// ✅ NEW - Reset Password
+router.put('/reset-password/:id', resetPassword);
 
 // Faculty
 router.get('/faculty', getAllFaculty);

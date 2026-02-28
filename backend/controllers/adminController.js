@@ -111,6 +111,42 @@ exports.deleteStudent = async (req, res) => {
   }
 };
 
+// ✅ NEW - Reset student/faculty password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 4) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 4 characters',
+      });
+    }
+
+    const user = await User.findById(req.params.id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    user.password = newPassword;
+    await user.save(); // pre('save') hook auto encrypt pannudum
+
+    console.log(`✅ Password reset for user: ${user.userId}`);
+
+    res.status(200).json({
+      success: true,
+      message: `Password reset successfully for ${user.name}`,
+    });
+  } catch (error) {
+    console.error('❌ Error in resetPassword:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Get all faculty
 exports.getAllFaculty = async (req, res) => {
   try {

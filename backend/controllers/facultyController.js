@@ -56,7 +56,6 @@ exports.markAttendance = async (req, res) => {
   try {
     const { subjectCode, subjectName, date, attendanceList } = req.body;
 
-    // Enhanced validation with detailed error messages
     if (!subjectCode || !date || !attendanceList) {
       console.log('❌ Validation failed:', { subjectCode, date, attendanceList });
       return res.status(400).json({
@@ -66,7 +65,6 @@ exports.markAttendance = async (req, res) => {
     }
 
     if (!Array.isArray(attendanceList) || attendanceList.length === 0) {
-      console.log('❌ Invalid attendanceList:', attendanceList);
       return res.status(400).json({
         success: false,
         message: 'attendanceList must be a non-empty array',
@@ -78,7 +76,7 @@ exports.markAttendance = async (req, res) => {
       subjectName,
       date,
       studentsCount: attendanceList.length,
-      facultyId: req.user.id
+      facultyId: req.user.id,
     });
 
     const records = [];
@@ -86,19 +84,20 @@ exports.markAttendance = async (req, res) => {
 
     for (const item of attendanceList) {
       try {
-        // Validate item structure
         if (!item.studentId) {
           errors.push({ error: 'Missing studentId', item });
           continue;
         }
 
-        // Parse date correctly - use UTC midnight
+        // ✅ FIX - Get student's actual semester from DB
+        const studentData = await User.findById(item.studentId).select('semester');
+        const studentSemester = studentData?.semester || 6;
+
         const attendanceDate = new Date(date);
         attendanceDate.setUTCHours(0, 0, 0, 0);
 
-        console.log(`   Processing student: ${item.studentId}, status: ${item.status}`);
+        console.log(`   Processing student: ${item.studentId}, status: ${item.status}, semester: ${studentSemester}`);
 
-        // Check if attendance already exists for this student, subject, date
         const existing = await Attendance.findOne({
           student: item.studentId,
           subjectCode: subjectCode,
@@ -106,28 +105,27 @@ exports.markAttendance = async (req, res) => {
         });
 
         if (existing) {
-          // Update existing record
           existing.status = item.status;
           existing.markedBy = req.user.id;
-          existing.subject = subjectName || existing.subject; // Update name if provided
+          existing.subject = subjectName || existing.subject;
+          existing.semester = studentSemester; // ✅ FIX - update semester too
           await existing.save();
-          
+
           console.log(`   ✅ Updated attendance for student ${item.studentId}`);
           records.push({ studentId: item.studentId, action: 'updated', status: item.status });
         } else {
-          // Create new record
-          const newRecord = await Attendance.create({
+          await Attendance.create({
             student: item.studentId,
             subject: subjectName,
             subjectCode: subjectCode,
             date: attendanceDate,
             status: item.status,
             session: 'Full Day',
-            semester: 6,
+            semester: studentSemester, // ✅ FIX - use real semester
             academicYear: '2025-2026',
             markedBy: req.user.id,
           });
-          
+
           console.log(`   ✅ Created attendance for student ${item.studentId}`);
           records.push({ studentId: item.studentId, action: 'created', status: item.status });
         }
@@ -137,7 +135,6 @@ exports.markAttendance = async (req, res) => {
       }
     }
 
-    // Response with detailed information
     const response = {
       success: true,
       message: 'Attendance marked successfully!',
@@ -145,8 +142,8 @@ exports.markAttendance = async (req, res) => {
         total: attendanceList.length,
         processed: records.length,
         failed: errors.length,
-        created: records.filter(r => r.action === 'created').length,
-        updated: records.filter(r => r.action === 'updated').length,
+        created: records.filter((r) => r.action === 'created').length,
+        updated: records.filter((r) => r.action === 'updated').length,
       },
       data: records,
     };
@@ -161,10 +158,10 @@ exports.markAttendance = async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.error('❌ Error in markAttendance:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };
@@ -178,21 +175,17 @@ exports.getAttendanceBySubject = async (req, res) => {
     const { date } = req.query;
 
     let query = { subjectCode };
-    
+
     if (date) {
       const queryDate = new Date(date);
       queryDate.setUTCHours(0, 0, 0, 0);
       query.date = queryDate;
     }
 
-    console.log('🔍 Fetching attendance:', query);
-
     const attendance = await Attendance.find(query)
       .populate('student', 'name userId rollNumber')
       .populate('markedBy', 'name')
       .sort({ date: -1 });
-
-    console.log(`✅ Found ${attendance.length} attendance records`);
 
     res.status(200).json({
       success: true,
@@ -230,7 +223,10 @@ exports.enterMarks = async (req, res) => {
 
     for (const item of marksList) {
       try {
-        // Validate and cap marks
+        // ✅ FIX - Get student's actual semester
+        const studentData = await User.findById(item.studentId).select('semester');
+        const studentSemester = studentData?.semester || 6;
+
         const cia1 = Math.min(Math.max(item.cia1 || 0, 0), 20);
         const cia2 = Math.min(Math.max(item.cia2 || 0, 0), 20);
         const cia3 = Math.min(Math.max(item.cia3 || 0, 0), 20);
@@ -240,28 +236,26 @@ exports.enterMarks = async (req, res) => {
         const existing = await Marks.findOne({
           student: item.studentId,
           subjectCode: subjectCode,
-          semester: 6,
+          semester: studentSemester, // ✅ FIX - use real semester
         });
 
         if (existing) {
-          // Update existing marks
           existing.internalMarks.cia1 = cia1;
           existing.internalMarks.cia2 = cia2;
           existing.internalMarks.cia3 = cia3;
           existing.internalMarks.assignment = assignment;
           existing.internalMarks.totalInternal = totalInternal;
           existing.subject = subjectName || existing.subject;
-
           await existing.save();
+
           console.log(`   ✅ Updated marks for student ${item.studentId}`);
           records.push({ studentId: item.studentId, action: 'updated' });
         } else {
-          // Create new marks record
           await Marks.create({
             student: item.studentId,
             subject: subjectName,
             subjectCode: subjectCode,
-            semester: 6,
+            semester: studentSemester, // ✅ FIX - use real semester
             academicYear: '2025-2026',
             internalMarks: {
               cia1,
@@ -278,6 +272,7 @@ exports.enterMarks = async (req, res) => {
             },
             credits: 3,
           });
+
           console.log(`   ✅ Created marks for student ${item.studentId}`);
           records.push({ studentId: item.studentId, action: 'created' });
         }
@@ -307,10 +302,10 @@ exports.enterMarks = async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.error('❌ Error in enterMarks:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };
@@ -322,12 +317,9 @@ exports.getMarksBySubject = async (req, res) => {
   try {
     const { subjectCode } = req.params;
 
-    console.log('🔍 Fetching marks for:', subjectCode);
-
     const marks = await Marks.find({
       subjectCode,
-      semester: 6,
-    }).populate('student', 'name userId rollNumber');
+    }).populate('student', 'name userId rollNumber'); // ✅ FIX - removed hardcoded semester filter
 
     console.log(`✅ Found ${marks.length} marks records`);
 
